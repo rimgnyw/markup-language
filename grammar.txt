@@ -1,0 +1,7 @@
+<S> ::= <text> | <text> <S>
+<text> ::= str | italic str italic | bold str bold
+
+terminal symbols:
+str: [a-zA-Z]+
+italic: **
+bold: ''

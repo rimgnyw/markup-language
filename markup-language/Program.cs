@@ -20,13 +20,15 @@ static void runPrompt()
 
 static void run(String source)
 {
-    Scanner scanner = new Scanner(source);
-    List<Token> tokens = scanner.scanTokens();
-
-    foreach (Token token in tokens)
+    Lexer lexer = new Lexer(source);
+    // List<Token> tokens = lexer.scanTokens();
+    Parser parser = new Parser(lexer);
+    ParseTree result = parser.parse();
+    /* foreach (Token token in lexer.tokens)
     {
         Console.Write(token.type);
         Console.Write(" ");
-    }
+    } */
+    Console.WriteLine(result.process());
     Console.WriteLine();
 }

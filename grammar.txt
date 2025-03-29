@@ -1,5 +1,5 @@
 <S> ::= <text> | <text> <S>
-<text> ::= str | italic str italic | bold str bold
+<text> ::= str | italic <text> italic | bold <text> bold
 
 terminal symbols:
 str: [a-zA-Z]+

@@ -1,17 +1,19 @@
 using static TokenType;
 using System.Text.RegularExpressions;
 
-class Scanner
+class Lexer
 {
     private int start = 0;
     private int current = 0;
     private int line = 1;
+    private int currentToken = 0;
     private readonly String source;
     private readonly List<Token> tokens = new List<Token>();
 
-    public Scanner(String source)
+    public Lexer(String source)
     {
         this.source = source;
+        scanTokens();
     }
 
     public List<Token> scanTokens()
@@ -48,20 +50,22 @@ class Scanner
 
     private void str()
     {
-        Regex rg = new Regex(@"[(\n)(\*)(\')]");
-        while (!rg.IsMatch(peek().ToString()) && !endOfLine())
+        Regex rg = new Regex(@"(\n)|(\*\*)|(\'\')");
+        while (!rg.IsMatch(peek().ToString() + peekNext().ToString()) && !endOfLine())
+        {
             advance();
+        }
 
         if (endOfLine())
         {
-            String v = source.Substring(start, current - start - 1);
+            String v = source.Substring(start, current);
             addToken(STR, v);
             return;
         }
 
         // detected markdown symbol
+        String value = source.Substring(start, current - start);// remove trailing marker
 
-        String value = source.Substring(start, current - start - 1);
         addToken(STR, value);
 
     }
@@ -78,6 +82,12 @@ class Scanner
     {
         if (endOfLine()) return '\0';
         return source[current];
+    }
+    private char peekNext()
+    {
+        if (current + 1 > source.Length - 1)
+            return '\0';
+        return source[current + 1];
     }
 
     private bool endOfLine()
@@ -98,5 +108,16 @@ class Scanner
 
         String text = source.Substring(start, current - start);
         tokens.Add(new Token(type, text, literal));
+    }
+    public Token peekToken()
+    {
+        if (currentToken > tokens.Count - 1) throw new Exception("I am going to kill myself");
+        return tokens[currentToken];
+    }
+    public Token nextToken()
+    {
+        Token result = peekToken();
+        currentToken++;
+        return result;
     }
 }

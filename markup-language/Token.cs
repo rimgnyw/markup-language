@@ -11,4 +11,5 @@ class Token
         this.literal = literal;
 
     }
+    public TokenType getType() { return type; }
 }

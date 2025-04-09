@@ -1,67 +1,72 @@
-abstract class ParseTree {
+abstract class ParseTree
+{
     abstract public String process();
 }
 
-class Line : ParseTree {
+class Node : ParseTree
+{
     ParseTree left, right;
-    public Line(ParseTree left, ParseTree right) {
+    public Node(ParseTree left, ParseTree right)
+    {
         this.left = left;
         this.right = right;
     }
-    public override string process() {
+    public override string process()
+    {
         return left.process() + right.process();
     }
 }
 
-class Text : ParseTree {
-    ParseTree left, center, right;
-    public Text(ParseTree format, ParseTree content) {
-        this.left = format;
-        this.right = format;
-        this.center = content;
+// Text is an end-node and only returns the text it contains
+class Text : ParseTree
+{
+    string text;
+    public Text(string text)
+    {
+        this.text = text;
     }
-    public override string process() {
-        return left.process() + center.process() + right.process();
+    public override string process()
+    {
+
+        return text;
+    }
+}
+// TODO: italic and bold should return bolded and italic html
+class Italic : ParseTree
+{
+    ParseTree content;
+    public Italic(ParseTree content)
+    {
+        this.content = content;
+    }
+    public override string process()
+    {
+        return "<i>" + content.process() + "</i>";
+    }
+}
+class Bold : ParseTree
+{
+    ParseTree content;
+    public Bold(ParseTree content)
+    {
+        this.content = content;
+    }
+    public override string process()
+    {
+        return "<b>" + content.process() + "</b>";
     }
 }
 
-class Bolded : ParseTree {
-    ParseTree child;
-    public Bolded(ParseTree child) {
-        this.child = child;
+class NewLine : ParseTree
+{
+    ParseTree before, after;
+    public NewLine(ParseTree before, ParseTree after)
+    {
+        this.before = before;
+        this.after = after;
     }
-    public override String process() {
-        return "<b>" + child.process() + "</b>";
-    }
-}
-
-class Italics : ParseTree {
-    ParseTree child;
-    public Italics(ParseTree child) {
-        this.child = child;
-    }
-    public override String process() {
-        return "<em>" + child.process() + "</em>";
-    }
-}
-
-class Str : ParseTree {
-    String data;
-    public Str(String data) {
-        this.data = data;
-    }
-    public override string process() {
-        return data;
-    }
-}
-
-class NewLine : ParseTree {
-    ParseTree left, right;
-    public NewLine(ParseTree left, ParseTree right) {
-        this.left = left;
-        this.right = right;
-    }
-    public override string process() {
-        return left.process() + "<br>" + right.process();
+    public override string process()
+    {
+        return before.process() + "<br>\n" + after.process();
     }
 }

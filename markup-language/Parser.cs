@@ -1,84 +1,78 @@
+using static TokenType;
 class Parser
 {
-    private Lexer lexer;
+    private int current = 0;
+    private readonly List<Token> tokens = new List<Token>();
 
-    public Parser(Lexer lexer)
+    public Parser(List<Token> tokens)
     {
-        this.lexer = lexer;
+        this.tokens = tokens;
     }
 
     public ParseTree parse()
     {
-        ParseTree result = line();//S();
+        ParseTree result = S();
         return result;
     }
 
-    /*     public ParseTree S()
+    public ParseTree S()
+    {
+        ParseTree result = textSegment();
+
+        while (peekToken().getType() != EOF)
         {
-            ParseTree result = text();
-            Console.WriteLine("one " + result.process());
-            // Console.WriteLine("The token is " + lexer.peekToken().getType());
-            if (lexer.peekToken().getType() == TokenType.NL)
+            if (peekToken().getType() == NL)
             {
-                lexer.nextToken(); // consume NL
-                ParseTree next = S();
-                Console.WriteLine("two " + result.process());
+                nextToken(); // consume the new line
+                ParseTree next = textSegment();
                 result = new NewLine(result, next);
             }
-            else if (lexer.peekToken().getType() == TokenType.STR
-                   || lexer.peekToken().getType() == TokenType.ITALIC
-                    || lexer.peekToken().getType() == TokenType.BOLD)
+            else
             {
-                ParseTree next = S();
-                Console.WriteLine("three " + result.process());
-                result = new Line(result, next);
+                ParseTree next = textSegment();
+                result = new Node(result, next);
             }
-            return result;
-
-        } */
-
-    public ParseTree line()
-    {
-        ParseTree result = text();
-        while (lexer.peekToken().getType() == TokenType.ITALIC ||
-               lexer.peekToken().getType() == TokenType.BOLD)
-        {
-            ParseTree next = text();
-            result = new Line(result, next);
         }
         return result;
     }
-
-    public ParseTree text()
+    public ParseTree textSegment()
     {
-        Token t = lexer.peekToken();
-        if (t.getType() == TokenType.STR)
+        ParseTree result;
+        Token token = nextToken();
+        if (token.getType() == TEXT)
+            result = new Text(token.getText());
+        else if (token.getType() == ITALIC)
         {
-            String text = (String)t.literal;
-            // Console.WriteLine("literally " + t.literal);
-            // consume the str token
-            lexer.nextToken();
-            return new Str(text);
+            if (peekToken().getType() == ITALIC) throw new NotImplementedException("too many italic error");
+            ParseTree content = textSegment();
+            if (nextToken().getType() != ITALIC) throw new NotImplementedException("missing italic error");
+            result = new Italic(content);
         }
-        if (t.getType() == TokenType.ITALIC)
+        else if (token.getType() == BOLD)
         {
-            lexer.nextToken(); // consume ITALIC
-            ParseTree child = text();
-            if (lexer.nextToken().getType() != TokenType.ITALIC) throw new Exception($"Temp syntax error: expected \"**\" got \"{lexer.peekToken().literal}\" exception");
-            return new Italics(child);
-        }
-        if (t.getType() == TokenType.BOLD)
-        {
-            lexer.nextToken(); // consume BOLD
-            ParseTree child = text();
-            if (lexer.nextToken().getType() != TokenType.BOLD) throw new Exception($"Temp syntax error: expected \"''\" got \"{lexer.peekToken().literal}\" exception");
-            return new Bolded(child);
+            if (peekToken().getType() == BOLD) throw new NotImplementedException("too many italic error");
+            ParseTree content = textSegment();
+            if (nextToken().getType() != BOLD) throw new NotImplementedException("missing italic error");
+            result = new Bold(content);
         }
         else
         {
-            throw new Exception($"Temp syntax error: what the fuck is a \"{lexer.peekToken().literal}?\"");
+            throw new NotImplementedException("invalid token error: " + token.getType());
         }
 
+        return result;
+    }
+
+    public Token peekToken()
+    {
+        if (current > tokens.Count - 1) throw new Exception("I am going to kill myself");
+        return tokens[current];
+    }
+    public Token nextToken()
+    {
+        Token result = peekToken();
+        current++;
+        return result;
     }
 
 }

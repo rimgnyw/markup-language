@@ -2,9 +2,10 @@ enum TokenType {
     // two character tokens
     ITALIC, BOLD,
 
-    //literal
-    STR,
+    //regular text
+    TEXT,
 
+    // new line
     NL,
 
     EOF

@@ -1,108 +1,113 @@
 using static TokenType;
 using System.Text.RegularExpressions;
 
-class Lexer {
+class Lexer
+{
     private int start = 0;
     private int current = 0;
     private int line = 1;
-    private int currentToken = 0;
-    private readonly String source;
+    private String source;
     private readonly List<Token> tokens = new List<Token>();
 
-    public Lexer(String source) {
-        this.source = source;
+    public Lexer(String source)
+    {
+        this.source = source.Replace("\r\n", "\n"); // sanitise input to avoid windows garbash
         scanTokens();
     }
 
-    public List<Token> scanTokens() {
-        while (!endOfLine()) {
+    public List<Token> scanTokens()
+    {
+        while (!endOfLine())
+        {
             start = current;
             scanToken();
         }
-        tokens.Add(new Token(EOF, "", null));
+        tokens.Add(new Token(EOF, null, line));
         return tokens;
     }
 
 
-    private void scanToken() {
+    private void scanToken()
+    {
         char c = advance();
 
-        switch (c) {
+        switch (c)
+        {
             case '*':
                 if (match('*')) addToken(ITALIC);
-                else str(); break;
+                else text(); break;
             case '\'':
                 if (match('\'')) addToken(BOLD);
-                else str(); break;
+                else text(); break;
             case '\n':
                 line++;
                 addToken(NL); break;
             default:
-                str();
+                text();
                 break;
 
         }
     }
 
 
-    private void str() {
+    private void text()
+    {
         Regex rg = new Regex(@"(\n)|(\*\*)|(\'\')");
-        while (!rg.IsMatch(peek().ToString() + peekNext().ToString()) && !endOfLine()) {
+        while (!rg.IsMatch(peek().ToString() + peekNext().ToString()) && !endOfLine())
+        {
             advance();
         }
 
-        if (endOfLine()) {
+        if (endOfLine())
+        {
             String v = source.Substring(start, current - start);
-            addToken(STR, v);
+            addToken(TEXT, v);
             return;
         }
 
         // detected markdown symbol
         String value = source.Substring(start, current - start);// remove trailing marker
 
-        addToken(STR, value);
+        addToken(TEXT, value);
 
     }
 
-    private bool match(char expected) {
+    private bool match(char expected)
+    {
         if (endOfLine()) return false;
         if (source[current] != expected) return false;
         current++;
         return true;
     }
 
-    private char peek() {
+    private char peek()
+    {
         if (endOfLine()) return '\0';
         return source[current];
     }
-    private char peekNext() {
+    private char peekNext()
+    {
         if (current + 1 > source.Length - 1)
             return '\0';
         return source[current + 1];
     }
 
-    private bool endOfLine() {
+    private bool endOfLine()
+    {
         return current >= source.Length;
     }
 
-    private char advance() {
+    private char advance()
+    {
         return source[current++];
     }
-    private void addToken(TokenType type) {
+    private void addToken(TokenType type)
+    {
         addToken(type, null);
     }
-    private void addToken(TokenType type, object literal) {
+    private void addToken(TokenType type, object literal)
+    {
 
-        String text = source.Substring(start, current - start);
-        tokens.Add(new Token(type, text, literal));
-    }
-    public Token peekToken() {
-        if (currentToken > tokens.Count - 1) throw new Exception("I am going to kill myself");
-        return tokens[currentToken];
-    }
-    public Token nextToken() {
-        Token result = peekToken();
-        currentToken++;
-        return result;
+        tokens.Add(new Token(type, literal, line));
     }
 }

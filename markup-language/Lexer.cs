@@ -1,24 +1,20 @@
 using static TokenType;
 using System.Text.RegularExpressions;
 
-class Lexer
-{
+class Lexer {
     private int start = 0;
     private int current = 0;
     private int line = 1;
     private String source;
     private readonly List<Token> tokens = new List<Token>();
 
-    public Lexer(String source)
-    {
+    public Lexer(String source) {
         this.source = source.Replace("\r\n", "\n"); // sanitise input to avoid windows garbash
         scanTokens();
     }
 
-    public List<Token> scanTokens()
-    {
-        while (!endOfLine())
-        {
+    public List<Token> scanTokens() {
+        while (!endOfLine()) {
             start = current;
             scanToken();
         }
@@ -27,12 +23,10 @@ class Lexer
     }
 
 
-    private void scanToken()
-    {
+    private void scanToken() {
         char c = advance();
 
-        switch (c)
-        {
+        switch (c) {
             case '*':
                 if (match('*')) addToken(ITALIC);
                 else text(); break;
@@ -50,16 +44,13 @@ class Lexer
     }
 
 
-    private void text()
-    {
+    private void text() {
         Regex rg = new Regex(@"(\n)|(\*\*)|(\'\')");
-        while (!rg.IsMatch(peek().ToString() + peekNext().ToString()) && !endOfLine())
-        {
+        while (!rg.IsMatch(peek().ToString() + peekNext().ToString()) && !endOfLine()) {
             advance();
         }
 
-        if (endOfLine())
-        {
+        if (endOfLine()) {
             String v = source.Substring(start, current - start);
             addToken(TEXT, v);
             return;
@@ -72,41 +63,34 @@ class Lexer
 
     }
 
-    private bool match(char expected)
-    {
+    private bool match(char expected) {
         if (endOfLine()) return false;
         if (source[current] != expected) return false;
         current++;
         return true;
     }
 
-    private char peek()
-    {
+    private char peek() {
         if (endOfLine()) return '\0';
         return source[current];
     }
-    private char peekNext()
-    {
+    private char peekNext() {
         if (current + 1 > source.Length - 1)
             return '\0';
         return source[current + 1];
     }
 
-    private bool endOfLine()
-    {
+    private bool endOfLine() {
         return current >= source.Length;
     }
 
-    private char advance()
-    {
+    private char advance() {
         return source[current++];
     }
-    private void addToken(TokenType type)
-    {
+    private void addToken(TokenType type) {
         addToken(type, null);
     }
-    private void addToken(TokenType type, object literal)
-    {
+    private void addToken(TokenType type, object literal) {
 
         tokens.Add(new Token(type, literal, line));
     }

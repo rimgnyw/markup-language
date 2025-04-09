@@ -1,10 +1,11 @@
-enum TokenType
-{
+enum TokenType {
     // two character tokens
     ITALIC, BOLD,
 
     //literal
     STR,
+
+    NL,
 
     EOF
 }

@@ -1,14 +1,14 @@
-﻿// See https://aka.ms/new-console-template for more information
+// See https://aka.ms/new-console-template for more information
 // Console.Write("> ");
 // String? input = Console.ReadLine();
+using System.Text;
 
-runPrompt();
+// runPrompt();
+runFile("../testfile.tst");
 
 // Console.WriteLine(input);
-static void runPrompt()
-{
-    while (true)
-    {
+static void runPrompt() {
+    while (true) {
         Console.Write("> ");
         // TODO: replace with StreamReader later
         String? line = Console.ReadLine();
@@ -18,8 +18,7 @@ static void runPrompt()
 
 }
 
-static void run(String source)
-{
+static void run(String source) {
     Lexer lexer = new Lexer(source);
     // List<Token> tokens = lexer.scanTokens();
     Parser parser = new Parser(lexer);
@@ -31,4 +30,11 @@ static void run(String source)
     } */
     Console.WriteLine(result.process());
     Console.WriteLine();
+}
+
+static void runFile(String path) {
+    byte[] bytes = File.ReadAllBytes(path);
+    String content = Encoding.Default.GetString(bytes);
+    Console.WriteLine(content);
+    run(content);
 }

@@ -37,6 +37,10 @@ class Program {
     static string run(String source) {
         Lexer lexer = new Lexer(source);
         List<Token> tokens = lexer.scanTokens();
+        Console.WriteLine();
+        foreach (Token token in tokens)
+            Console.WriteLine(token.type);
+        Console.WriteLine();
         Parser parser = new Parser(tokens);
         ParseTree result = parser.parse();
         return result.process();

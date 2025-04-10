@@ -1,7 +1,8 @@
 .vscode
 .editorconfig
 *.tst
-*.txt
+test*
+*.bcp
 *.html
 
 .## Ignore Visual Studio temporary files, build results, and

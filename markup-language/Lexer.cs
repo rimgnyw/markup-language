@@ -43,22 +43,31 @@ class Lexer {
         }
     }
 
-
+    // FIXED?  \n is a one letter symbol but we're looking for a two letter symbol (I assume this worked because of the \r\n from before)
     private void text() {
-        Regex rg = new Regex(@"(\n)|(\*\*)|(\'\')");
-        while (!rg.IsMatch(peek().ToString() + peekNext().ToString()) && !endOfLine()) {
+        Regex rg = new Regex(@"(\*\*)|(\'\')");
+        while (!rg.IsMatch(peek().ToString() + peekNext().ToString()) && peek().ToString() != "\n" && !endOfLine()) {
             advance();
         }
 
         if (endOfLine()) {
             String v = source.Substring(start, current - start);
+            Console.WriteLine(v);
             addToken(TEXT, v);
             return;
+        }
+        if (peek().ToString() == "\n") {
+            String v = source.Substring(start, current - start);
+            Console.WriteLine(v);
+            addToken(TEXT, v);
+            return;
+
         }
 
         // detected markdown symbol
         String value = source.Substring(start, current - start);// remove trailing marker
 
+        Console.WriteLine(value);
         addToken(TEXT, value);
 
     }

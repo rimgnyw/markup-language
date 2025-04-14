@@ -10,7 +10,6 @@ class Lexer {
 
     public Lexer(String source) {
         this.source = source.Replace("\r\n", "\n"); // sanitise input to avoid windows garbash
-        scanTokens();
     }
 
     public List<Token> scanTokens() {
@@ -22,10 +21,10 @@ class Lexer {
         return tokens;
     }
 
-
     private void scanToken() {
         char c = advance();
 
+        // anything that isn't indentified as a token is read as text, including parts of tokens
         switch (c) {
             case '*':
                 if (match('*')) addToken(ITALIC);
@@ -43,31 +42,16 @@ class Lexer {
         }
     }
 
-    // FIXED?  \n is a one letter symbol but we're looking for a two letter symbol (I assume this worked because of the \r\n from before)
     private void text() {
         Regex rg = new Regex(@"(\*\*)|(\'\')");
+        // continue through the text token until it's broken by a different token
         while (!rg.IsMatch(peek().ToString() + peekNext().ToString()) && peek().ToString() != "\n" && !endOfLine()) {
             advance();
         }
 
-        if (endOfLine()) {
-            String v = source.Substring(start, current - start);
-            // Console.WriteLine(v);
-            addToken(TEXT, v);
-            return;
-        }
-        if (peek().ToString() == "\n") {
-            String v = source.Substring(start, current - start);
-            // Console.WriteLine(v);
-            addToken(TEXT, v);
-            return;
+        // remove trailing symbol(s) to get text token content
+        String value = source.Substring(start, current - start);
 
-        }
-
-        // detected markdown symbol
-        String value = source.Substring(start, current - start);// remove trailing marker
-
-        // Console.WriteLine(value);
         addToken(TEXT, value);
 
     }

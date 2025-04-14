@@ -1,7 +1,7 @@
 abstract class ParseTree {
     abstract public String process();
 }
-
+// generic node, used for tieing other nodes together to allow arbitrarily long documents
 class Node : ParseTree {
     ParseTree left, right;
     public Node(ParseTree left, ParseTree right) {
@@ -13,7 +13,6 @@ class Node : ParseTree {
     }
 }
 
-// Text is an end-node and only returns the text it contains
 class Text : ParseTree {
     string text;
     public Text(string text) {
@@ -21,10 +20,11 @@ class Text : ParseTree {
     }
     public override string process() {
 
+        // Text is an end-node and only returns the text it contains
         return text;
     }
 }
-// TODO: italic and bold should return bolded and italic html
+
 class Italic : ParseTree {
     ParseTree content;
     public Italic(ParseTree content) {

@@ -70,10 +70,7 @@ Options:
             Environment.Exit(1);
         }
         runFile(source, fileOut, fullDoc);
-        // runPrompt();
-        // runFile("../test2.tst");
     }
-    // Console.WriteLine(input);
     // TODO: delete this, why would you need a repl for markup
     static void runPrompt() {
         while (true) {

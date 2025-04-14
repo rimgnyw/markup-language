@@ -37,7 +37,6 @@ class Parser {
             else if (token.getType() == ITALIC || token.getType() == BOLD)
                 result = formattedText();
             else {
-                // throw new NotImplementedException("invalid token error: " + token.getType());
                 throw Program.error(token.line, $"invalid token: {token.getType()}");
             }
             return result;
@@ -46,7 +45,7 @@ class Parser {
             // We want to allow the program to continue so we can find more possible syntax errors
             // but we don't want the program to output anything so we exit the program if we reach end of file with errors
             if (peekToken().getType() == EOF)
-                Environment.Exit(1); // exit at EOF to avoid null reference
+                Environment.Exit(1); // exit at EOF
             return new ErrorNode();
         }
     }
@@ -72,8 +71,7 @@ class Parser {
             result = new Italic(content);
         }
         else if (token.getType() == BOLD) {
-            if (peekToken().getType() == BOLD) throw new NotImplementedException($"too many bolded error {token.line}");
-            ParseTree content = textSegment();
+            if (peekToken().getType() == BOLD) throw Program.error(token.line, "Too many bolded", "extra symbols"); ParseTree content = textSegment();
             while (peekToken().getType() != BOLD && peekToken().getType() != EOF) {
                 if (peekToken().getType() == NL) {
                     nextToken(); // consume the new line
@@ -85,18 +83,17 @@ class Parser {
                     content = new Node(content, next);
                 }
             }
-            if (nextToken().getType() != BOLD) throw new NotImplementedException($"missing bolded error {peekToken().line},{peekToken().getType()}");
-            result = new Bold(content);
+            if (nextToken().getType() != BOLD) throw Program.error(token.line, "Missing closing bolded marker", "missing closing symbol"); result = new Bold(content);
         }
         else {
-            throw new NotImplementedException("invalid token error: " + token.getType());
+            throw Program.error(token.line, "invalid token  " + token.getType());
         }
         return result;
 
     }
 
     public Token peekToken() {
-        if (current > tokens.Count - 1) throw new Exception("Token pointer out of range");
+        if (current > tokens.Count - 1) throw new Exception("Token pointer out of range"); // it should be impossible for a user to get this error
         return tokens[current];
     }
     public Token nextToken() {
@@ -105,7 +102,7 @@ class Parser {
         return result;
     }
     public Token previousToken() {
-        if (current - 1 < 0) throw new Exception("No previous token");
+        if (current - 1 < 0) throw new Exception("No previous token"); // it should be impossible for a user to get this error
         return tokens[current - 1];
     }
 

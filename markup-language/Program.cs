@@ -18,7 +18,7 @@ class Program {
 
     // TODO: come up with application name
     private const string HELP_MESSAGE = @"
-Usage: <application name here> [options] file...
+Usage: dotnet run -- [options] file...
 Options:
     -h, --help                  Display this information.
     -d, --document              Output complete HTML document
@@ -67,6 +67,7 @@ Options:
         }
         catch (Exception e) {
             Console.WriteLine("Error: " + e.Message);
+            Console.WriteLine("'dotnet run -- -h' for usage");
             Environment.Exit(1);
         }
         runFile(source, fileOut, fullDoc);

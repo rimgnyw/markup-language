@@ -54,3 +54,16 @@ class NewLine : ParseTree {
         return before.process() + "<br>\n" + after.process();
     }
 }
+// Node for parsing erroneous segments without crashing the program
+class ErrorNode : ParseTree {
+
+    string text;
+    public ErrorNode() {
+        this.text = "ERROR";
+    }
+    public override string process() {
+
+        return text;
+    }
+
+}

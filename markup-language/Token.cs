@@ -1,9 +1,9 @@
 class Token {
     public readonly TokenType type;
-    public readonly object literal;
+    public readonly string literal;
     public readonly int line;
 
-    public Token(TokenType type, object literal, int line) {
+    public Token(TokenType type, string literal, int line) {
         this.type = type;
         this.literal = literal;
         this.line = line;

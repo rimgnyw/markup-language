@@ -47,7 +47,7 @@ class Parser {
             // but we don't want the program to output anything so we exit the program if we reach end of file with errors
             if (peekToken().getType() == EOF)
                 Environment.Exit(1); // exit at EOF to avoid null reference
-            return null;
+            return new ErrorNode();
         }
     }
 

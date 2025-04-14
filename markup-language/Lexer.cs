@@ -18,7 +18,7 @@ class Lexer {
             start = current;
             scanToken();
         }
-        tokens.Add(new Token(EOF, null, line));
+        tokens.Add(new Token(EOF, "", line));
         return tokens;
     }
 
@@ -52,13 +52,13 @@ class Lexer {
 
         if (endOfLine()) {
             String v = source.Substring(start, current - start);
-            Console.WriteLine(v);
+            // Console.WriteLine(v);
             addToken(TEXT, v);
             return;
         }
         if (peek().ToString() == "\n") {
             String v = source.Substring(start, current - start);
-            Console.WriteLine(v);
+            // Console.WriteLine(v);
             addToken(TEXT, v);
             return;
 
@@ -67,7 +67,7 @@ class Lexer {
         // detected markdown symbol
         String value = source.Substring(start, current - start);// remove trailing marker
 
-        Console.WriteLine(value);
+        // Console.WriteLine(value);
         addToken(TEXT, value);
 
     }
@@ -97,9 +97,9 @@ class Lexer {
         return source[current++];
     }
     private void addToken(TokenType type) {
-        addToken(type, null);
+        addToken(type, "");
     }
-    private void addToken(TokenType type, object literal) {
+    private void addToken(TokenType type, string literal) {
 
         tokens.Add(new Token(type, literal, line));
     }

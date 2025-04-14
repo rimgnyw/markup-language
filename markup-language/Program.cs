@@ -15,42 +15,66 @@ class Program {
     private const string HTML_TEMPLATE_END = @"
     </body>
 </html>";
+
+    // TODO: come up with application name
+    private const string HELP_MESSAGE = @"
+Usage: <application name here> [options] file...
+Options:
+    -h, --help                  Display this information.
+    -d, --document              Output complete HTML document
+    -o <file>, --out <file>     place output into <file>
+";
+
     private static bool hadError = false;
     static void Main(string[] args) {
         bool fullDoc = false;
         bool doOut = false;
         string? fileOut = null;
         string? source = null;
-        foreach (string arg in args) {
-            if (arg == "-d")
-                // check for -d argument
-                fullDoc = true;
-            else if (arg == "-o")
-                doOut = true;
-            else if (source == null && !arg.StartsWith("-")) {
-                // first argument that isn't an option is the source file
-                source = arg;
+        try {
+            foreach (string arg in args) {
+                if (arg is "-h" or "--help" && args.Length == 1) {
+                    Console.WriteLine(HELP_MESSAGE);
+                    return;
+                }
+                if (arg is "-d" or "--document")
+                    // check for -d argument
+                    fullDoc = true;
+                else if (arg is "-o" or "--out")
+                    doOut = true;
+                else if (source == null && !arg.StartsWith("-")) {
+                    // first argument that isn't an option is the source file
+                    if (!File.Exists(arg)) throw new FileNotFoundException($"Cannot find {arg}: No such file");
+                    source = arg;
+                }
+                else if (doOut && source != null && !arg.StartsWith("-") && fileOut == null) {
+                    // specify the output file
+                    fileOut = arg;
+                }
+                else {
+                    throw new Exception("Invalid arguments");
+                }
             }
-            else if (doOut && source != null && !arg.StartsWith("-") && fileOut == null) {
-                // specify the output file
-                fileOut = arg;
-            }
-            else {
-                throw new Exception("Invalid arguments");
-            }
+            if (source == null)
+                throw new Exception("Missing file");
+            if (doOut && fileOut == null)
+                throw new Exception("'-o' option given but not output file specified");
 
         }
-        if (source == null)
-            throw new Exception("Missing file");
-        if (doOut && fileOut == null)
-            throw new Exception("'-o' option given but not output file specified");
-
-
+        catch (FileNotFoundException e) {
+            Console.WriteLine("Error: " + e.Message);
+            Environment.Exit(1);
+        }
+        catch (Exception e) {
+            Console.WriteLine("Error: " + e.Message);
+            Environment.Exit(1);
+        }
         runFile(source, fileOut, fullDoc);
         // runPrompt();
         // runFile("../test2.tst");
     }
     // Console.WriteLine(input);
+    // TODO: delete this, why would you need a repl for markup
     static void runPrompt() {
         while (true) {
             Console.Write("> ");
@@ -74,7 +98,6 @@ class Program {
         Parser parser = new Parser(tokens);
         ParseTree result = parser.parse();
 
-        // Had syntax error
         if (hadError)
             // exit on syntax error
             Environment.Exit(1);

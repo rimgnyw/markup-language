@@ -11,7 +11,10 @@ A parser for turning a very basic markup language into HTML.
 
 ## How to use
 
-`dotnet run -- [options] <filepath>`
+```bash
+dotnet run -- [options] <filepath>
+```
+
 see `dotnet run -- --help` for a list of options
 
 This program was developed using .NET 8 and is not guaranteed to function

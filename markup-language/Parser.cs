@@ -29,24 +29,33 @@ class Parser {
         return result;
     }
     public ParseTree textSegment() {
-        ParseTree result;
-        Token token = nextToken();
-        if (token.getType() == TEXT)
-            result = new Text(token.getText());
-        else if (token.getType() == ITALIC || token.getType() == BOLD)
-            result = formattedText();
-        else {
-            throw new NotImplementedException("invalid token error: " + token.getType());
+        try {
+            ParseTree result;
+            Token token = nextToken();
+            if (token.getType() == TEXT)
+                result = new Text(token.getText());
+            else if (token.getType() == ITALIC || token.getType() == BOLD)
+                result = formattedText();
+            else {
+                // throw new NotImplementedException("invalid token error: " + token.getType());
+                throw Program.error(token.line, $"invalid token: {token.getType()}");
+            }
+            return result;
         }
-
-        return result;
+        catch (ParseError) {
+            // We want to allow the program to continue so we can find more possible syntax errors
+            // but we don't want the program to output anything so we exit the program if we reach end of file with errors
+            if (peekToken().getType() == EOF)
+                Environment.Exit(1); // exit at EOF to avoid null reference
+            return null;
+        }
     }
 
     public ParseTree formattedText() {
         ParseTree result;
         Token token = previousToken();
         if (token.getType() == ITALIC) {
-            if (peekToken().getType() == ITALIC) throw new NotImplementedException($"too many italic error {token.line}");
+            if (peekToken().getType() == ITALIC) throw Program.error(token.line, "Too many italics", "extra symbols");
             ParseTree content = textSegment();
             while (peekToken().getType() != ITALIC && peekToken().getType() != EOF) {
                 if (peekToken().getType() == NL) {
@@ -59,7 +68,7 @@ class Parser {
                     content = new Node(content, next);
                 }
             }
-            if (nextToken().getType() != ITALIC) throw new NotImplementedException($"missing italic error {token.line}");
+            if (nextToken().getType() != ITALIC) throw Program.error(token.line, "Missing closing italics marker", "missing closing symbol");
             result = new Italic(content);
         }
         else if (token.getType() == BOLD) {
@@ -87,7 +96,7 @@ class Parser {
     }
 
     public Token peekToken() {
-        if (current > tokens.Count - 1) throw new Exception("I am going to kill myself");
+        if (current > tokens.Count - 1) throw new Exception("Token pointer out of range");
         return tokens[current];
     }
     public Token nextToken() {

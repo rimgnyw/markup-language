@@ -31,3 +31,12 @@ This program was developed using .NET 8 and is not guaranteed to function
 correctly on any other version of the .NET runtime.
 For best compatibility and stability, please use .NET 8
 when building or running this application.
+
+## TODO list
+
+- Decide if bold and italic should be allowed in headers and
+if not should they be read as text or error
+- Add more header levels
+- Add embedded links
+- Add (un)ordered lists
+- Add tables

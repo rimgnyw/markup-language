@@ -8,6 +8,7 @@ A parser for turning a very basic markup language into HTML.
 | --------------- | --------------- | --------------- |
 | ` **text** ` | `<i> text </i>`  | Makes italicised text |
 | `'' text ''` | `<b> text </b>`  | Makes bolded text |
+| `## text`    | `<h1> text </h1>`| Makes header 1. Broken by newlines |
 
 ## How to use
 

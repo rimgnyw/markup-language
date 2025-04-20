@@ -1,16 +1,5 @@
 # Markup Parser
 
-## TODO list
-
-- Decide if bold and italic should be allowed in headers and
-if not should they be read as text or error
-- Add more header levels
-- Add embedded links
-- Add (un)ordered lists
-- Add tables
-
-A parser for turning a very basic markup language into HTML.
-
 ## Language description
 
 | **Syntax** | **Output** | Description |

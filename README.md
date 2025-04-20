@@ -23,6 +23,7 @@ when building or running this application.
 
 ## TODO list
 
+- Prevent headers from appearing in the middle of a sentence
 - Decide if bold and italic should be allowed in headers and
 if not should they be read as text or error
 - Add more header levels

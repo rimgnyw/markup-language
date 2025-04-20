@@ -24,9 +24,16 @@ Options:
     -d, --document              Output complete HTML document
     -o <file>, --out <file>     place output into <file>
 ";
+    // debug
+    private static bool debug = false;
 
     private static bool hadError = false;
     static void Main(string[] args) {
+        // debug
+        if (debug) {
+            runPrompt();
+            return;
+        }
         bool fullDoc = false;
         bool doOut = false;
         string? fileOut = null;
@@ -72,7 +79,7 @@ Options:
         }
         runFile(source, fileOut, fullDoc);
     }
-    // TODO: delete this, why would you need a repl for markup
+    // debug repl
     static void runPrompt() {
         while (true) {
             Console.Write("> ");

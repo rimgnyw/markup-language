@@ -8,5 +8,8 @@ enum TokenType {
     // new line
     NL,
 
+    // headers
+    H1,
+
     EOF
 }

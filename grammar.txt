@@ -1,4 +1,4 @@
 <S>             ::= <TextSegment> <MoreText>
 <MoreText       ::= <TextSegment> <MoreText> | nl <TextSegment> <MoreText> | EPS
 <TextSegment>   ::= text | <FormattedText>
-<FormattedText> ::= italic <TextSegment> <MoreText> italic | bold <TextSegment> <MoreText> bold
+<FormattedText> ::= italic <TextSegment> <MoreText> italic | bold <TextSegment> <MoreText> bold | h1 text nl

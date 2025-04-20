@@ -25,6 +25,16 @@ class Text : ParseTree {
     }
 }
 
+class Header1 : ParseTree {
+    string text;
+    public Header1(string text) {
+        this.text = text;
+    }
+    public override string process() {
+        return "<h1>" + text + "</h1>";
+    }
+}
+
 class Italic : ParseTree {
     ParseTree content;
     public Italic(ParseTree content) {

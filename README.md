@@ -1,12 +1,14 @@
 # Markup Parser
 
+A C# program for turning a basic custom markup language into HTML.
+
 ## Language description
 
 | **Syntax** | **Output** | Description |
 | --------------- | --------------- | --------------- |
 | ` **text** ` | `<i> text </i>`  | Makes italicised text |
 | `'' text ''` | `<b> text </b>`  | Makes bolded text |
-| `## text`    | `<h1> text </h1>`| Makes header 1. Broken by newlines |
+| `## text`    | `<h1> text </h1>`| Makes heading 1. Broken by newlines |
 
 ## How to use
 
@@ -21,10 +23,8 @@ correctly on any other version of the .NET runtime.
 For best compatibility and stability, please use .NET 8
 when building or running this application.
 
-## TODO list
+## TODO
 
-- Prevent headers from appearing in the middle of a sentence
-- consider making text use \<p\> instead of \<br\>
 - Decide if bold and italic should be allowed in headers and
 if not should they be read as text or error
 - Add more header levels

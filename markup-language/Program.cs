@@ -36,15 +36,19 @@ Options:
     private static bool debug = false;
 
     private static bool hadError = false;
+
+    // command line options
+    private static bool fullDoc = false;
+    private static bool doOut = false;
+    private static bool tokenOut = false;
+
     static void Main(string[] args) {
         // debug
         if (debug) {
             runPrompt();
             return;
         }
-        bool fullDoc = false;
-        bool doOut = false;
-        bool tokenOut = false;
+
         string? fileOut = null;
         string? source = null;
         try {
@@ -62,6 +66,7 @@ Options:
                     tokenOut = true;
                 else if (source == null && !arg.StartsWith("-")) {
                     // first argument that isn't an option is the source file
+                    if (Path.GetExtension(arg) != ".mkl") throw new InvalidFileException("Source must be a .mkl file");
                     if (!File.Exists(arg)) throw new FileNotFoundException($"Cannot find {arg}: No such file");
                     source = arg;
                 }
@@ -83,18 +88,21 @@ Options:
             Console.WriteLine("Error: " + e.Message);
             Environment.Exit(1);
         }
+        catch (InvalidFileException e) {
+            Console.WriteLine("Error: " + e.Message);
+            Environment.Exit(1);
+        }
         catch (Exception e) {
             Console.WriteLine("Error: " + e.Message);
             Console.WriteLine("'dotnet run -- -h' for usage");
             Environment.Exit(1);
         }
-        runFile(source, fileOut, fullDoc, tokenOut);
+        runFile(source, fileOut);
     }
     // debug repl
     static void runPrompt() {
         while (true) {
             Console.Write("> ");
-            // TODO: replace with StreamReader later
             String? line = Console.ReadLine();
             if (line == null) break;
             string processed = run(line);
@@ -104,10 +112,10 @@ Options:
 
     }
 
-    static string run(String source, bool printTokens = false) {
+    static string run(String source) {
         Lexer lexer = new Lexer(source);
         List<Token> tokens = lexer.scanTokens();
-        if (printTokens) {
+        if (tokenOut) {
             Console.WriteLine();
             foreach (Token token in tokens) {
                 Console.Write($"{token.type} ");
@@ -126,12 +134,11 @@ Options:
         return result.process();
     }
 
-    static void runFile(String path, string? output, bool fullDoc, bool tokenOut) {
+    static void runFile(String path, string? output) {
         output ??= "./out.html"; // default value for output if null
         byte[] bytes = File.ReadAllBytes(path);
         String content = Encoding.Default.GetString(bytes);
-        // Console.WriteLine(content);
-        string processed = run(content, tokenOut);
+        string processed = run(content);
         if (fullDoc) {
             string finalOutput = HTML_TEMPLATE_START + processed + HTML_TEMPLATE_END;
             File.WriteAllText(output, finalOutput);
@@ -153,7 +160,7 @@ Options:
     }
 }
 
-// TODO: add more proper error types
+// TODO: add more error types
 class ParseError : Exception {
     public string type { get; set; }
     public ParseError(string type = "generic") {
@@ -161,3 +168,7 @@ class ParseError : Exception {
 
     }
 }
+
+class InvalidFileException : Exception {
+    public InvalidFileException(string message) : base(message) { }
+};

@@ -1,4 +1,5 @@
 using System.Text;
+using static TokenType;
 
 class Program {
     private const string HTML_TEMPLATE_START = @"
@@ -22,6 +23,7 @@ Usage: dotnet run -- [options] file...
 Options:
     -h, --help                  Display this information.
     -d, --document              Output complete HTML document
+    -t, --tokens                Output tokenisation
     -o <file>, --out <file>     place output into <file>
 ";
     // debug
@@ -36,6 +38,7 @@ Options:
         }
         bool fullDoc = false;
         bool doOut = false;
+        bool tokenOut = false;
         string? fileOut = null;
         string? source = null;
         try {
@@ -49,6 +52,8 @@ Options:
                     fullDoc = true;
                 else if (arg is "-o" or "--out")
                     doOut = true;
+                else if (arg is "-t" or "--tokens")
+                    tokenOut = true;
                 else if (source == null && !arg.StartsWith("-")) {
                     // first argument that isn't an option is the source file
                     if (!File.Exists(arg)) throw new FileNotFoundException($"Cannot find {arg}: No such file");
@@ -77,7 +82,7 @@ Options:
             Console.WriteLine("'dotnet run -- -h' for usage");
             Environment.Exit(1);
         }
-        runFile(source, fileOut, fullDoc);
+        runFile(source, fileOut, fullDoc, tokenOut);
     }
     // debug repl
     static void runPrompt() {
@@ -93,13 +98,18 @@ Options:
 
     }
 
-    static string run(String source) {
+    static string run(String source, bool printTokens = false) {
         Lexer lexer = new Lexer(source);
         List<Token> tokens = lexer.scanTokens();
-        // Console.WriteLine();
-        // foreach (Token token in tokens)
-        //     Console.WriteLine(token.type);
-        // Console.WriteLine();
+        if (printTokens) {
+            Console.WriteLine();
+            foreach (Token token in tokens) {
+                Console.Write($"{token.type} ");
+                if (token.type == NL)
+                    Console.WriteLine();
+            }
+            Console.WriteLine();
+        }
         Parser parser = new Parser(tokens);
         ParseTree result = parser.parse();
 
@@ -110,12 +120,12 @@ Options:
         return result.process();
     }
 
-    static void runFile(String path, string? output, bool fullDoc) {
+    static void runFile(String path, string? output, bool fullDoc, bool tokenOut) {
         output ??= "./out.html"; // default value for output if null
         byte[] bytes = File.ReadAllBytes(path);
         String content = Encoding.Default.GetString(bytes);
         // Console.WriteLine(content);
-        string processed = run(content);
+        string processed = run(content, tokenOut);
         if (fullDoc) {
             string finalOutput = HTML_TEMPLATE_START + processed + HTML_TEMPLATE_END;
             File.WriteAllText(output, finalOutput);
@@ -126,11 +136,12 @@ Options:
     }
 
     public static ParseError error(int line, string message) {
+        hadError = true;
         Console.WriteLine($"Error at line {line}: {message}");
         return new ParseError();
     }
     public static ParseError error(int line, string message, string type) {
-
+        hadError = true;
         Console.WriteLine($"Error at line {line}: {message}");
         return new ParseError(type);
     }

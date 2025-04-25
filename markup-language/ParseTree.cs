@@ -13,6 +13,27 @@ class Node : ParseTree {
     }
 }
 
+class Paragraph : ParseTree {
+    ParseTree content;
+    public Paragraph(ParseTree content) {
+        this.content = content;
+    }
+    public override string process() {
+        return "<p>" + content.process() + "</p>\n";
+    }
+}
+
+class ParagraphNode : ParseTree {
+    ParseTree left, right;
+    public ParagraphNode(ParseTree left, ParseTree right) {
+        this.left = left;
+        this.right = right;
+    }
+    public override string process() {
+        return left.process() + right.process();
+    }
+}
+
 class Text : ParseTree {
     string text;
     public Text(string text) {
@@ -31,7 +52,7 @@ class Header1 : ParseTree {
         this.text = text;
     }
     public override string process() {
-        return "<h1>" + text + "</h1>";
+        return "<h1>" + text + "</h1>\n";
     }
 }
 
@@ -54,16 +75,6 @@ class Bold : ParseTree {
     }
 }
 
-class NewLine : ParseTree {
-    ParseTree before, after;
-    public NewLine(ParseTree before, ParseTree after) {
-        this.before = before;
-        this.after = after;
-    }
-    public override string process() {
-        return before.process() + "<br>\n" + after.process();
-    }
-}
 // Node for parsing erroneous segments without crashing the program
 class ErrorNode : ParseTree {
 

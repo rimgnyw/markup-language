@@ -13,20 +13,40 @@ class Parser {
     }
 
     public ParseTree S() {
-        ParseTree result = textSegment();
+        ParseTree result = paragraph();
 
+        // Tail
+        while (peekToken().getType() != EOF) {
+            ParseTree tail = paragraph();
+            result = new ParagraphNode(result, tail);
+        }
+
+        return result;
+    }
+    public ParseTree paragraph() {
+        ParseTree result;
+        Token token = peekToken();
+        if (token.getType() == H1) {
+            result = new Header1(token.getText());
+            if (nextToken().getType() != EOF)
+                nextToken();
+            return result;
+        }
+        else {
+            result = textSegment();
+        }
+        // MoreText
         while (peekToken().getType() != EOF) {
             if (peekToken().getType() == NL) {
                 nextToken(); // consume the new line
-                ParseTree next = textSegment();
-                result = new NewLine(result, next);
+                return new Paragraph(result);
             }
             else {
                 ParseTree next = textSegment();
                 result = new Node(result, next);
             }
         }
-        return result;
+        return new Paragraph(result);
     }
     public ParseTree textSegment() {
         try {
@@ -34,7 +54,7 @@ class Parser {
             Token token = nextToken();
             if (token.getType() == TEXT)
                 result = new Text(token.getText());
-            else if (token.getType() == ITALIC || token.getType() == BOLD || token.getType() == H1)
+            else if (token.getType() == ITALIC || token.getType() == BOLD)
                 result = formattedText();
             else {
                 throw Program.error(token.line, $"invalid token: {token.getType()}");
@@ -59,8 +79,9 @@ class Parser {
             while (peekToken().getType() != ITALIC && peekToken().getType() != EOF) {
                 if (peekToken().getType() == NL) {
                     nextToken(); // consume the new line
-                    ParseTree next = textSegment();
-                    content = new NewLine(content, next);
+                    return content;
+                    // ParseTree next = textSegment();
+                    // content = new NewLine(content, next);
                 }
                 else {
                     ParseTree next = textSegment();
@@ -75,8 +96,9 @@ class Parser {
             while (peekToken().getType() != BOLD && peekToken().getType() != EOF) {
                 if (peekToken().getType() == NL) {
                     nextToken(); // consume the new line
-                    ParseTree next = textSegment();
-                    content = new NewLine(content, next);
+                    return content;
+                    // ParseTree next = textSegment();
+                    // content = new NewLine(content, next);
                 }
                 else {
                     ParseTree next = textSegment();
@@ -84,9 +106,6 @@ class Parser {
                 }
             }
             if (nextToken().getType() != BOLD) throw Program.error(token.line, "Missing closing bolded marker", "missing closing symbol"); result = new Bold(content);
-        }
-        else if (token.getType() == H1) {
-            return new Header1(token.getText());
         }
         else {
             throw Program.error(token.line, "invalid token  " + token.getType());

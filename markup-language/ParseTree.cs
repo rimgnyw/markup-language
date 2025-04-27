@@ -53,12 +53,12 @@ class Text : ParseTree {
 }
 
 class Header1 : ParseTree {
-    string text;
-    public Header1(string text) {
-        this.text = text;
+    ParseTree content;
+    public Header1(ParseTree content) {
+        this.content = content;
     }
     public override string process() {
-        return "<h1>" + text + "</h1>\n";
+        return "<h1>" + content.process() + "</h1>\n";
     }
 }
 

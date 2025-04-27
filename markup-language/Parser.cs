@@ -33,10 +33,16 @@ class Parser {
         ParseTree result;
         Token token = peekToken();
         if (token.getType() == H1) {
-            result = new Header1(token.getText());
-            if (nextToken().getType() != EOF)
-                nextToken();
-            return result;
+            nextToken(); // consume header
+            ParseTree content = textSegment();
+            // result = new Header1(content);
+            while (peekToken().getType() != NL) {
+                ParseTree next = textSegment();
+                content = new Node(content, next);
+            }
+            nextToken(); // consume newline
+            return new Header1(content);
+            // return result;
         }
         else {
             result = textSegment();

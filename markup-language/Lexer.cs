@@ -39,7 +39,7 @@ class Lexer {
                 if (match('\'')) addToken(BOLD);
                 else text(); break;
             case '#':
-                if (match('#')) header();
+                if (match('#')) addToken(H1);
                 else text(); break;
             case '\n':
                 line++;
@@ -62,18 +62,6 @@ class Lexer {
         String value = source.Substring(start, current - start);
 
         addToken(TEXT, value);
-
-    }
-
-    private void header() {
-        while (peek().ToString() != "\n" && !endOfLine()) {
-            advance();
-        }
-
-        // remove trailing symbol(s) to get text token content
-        String value = source.Substring(start + 2, current - start - 2);
-
-        addToken(H1, value);
 
     }
 

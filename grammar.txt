@@ -1,5 +1,5 @@
 <S>             ::= <Paragraph> <Tail>
-<Paragraph>	::= <TextSegment> <MoreText> | h1 text
+<Paragraph>	::= <TextSegment> <MoreText> | h1 <TextSegment> <MoreText>
 <Tail> 		::= nl <Paragraph> <Tail> | EPS
 <MoreText       ::= <TextSegment> <MoreText> | EPS
 <TextSegment>   ::= text | <FormattedText>
